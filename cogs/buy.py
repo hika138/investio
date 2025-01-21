@@ -1,6 +1,7 @@
 # 株を買うコマンド
 import os
 import discord
+from typing import Literal
 from discord import app_commands
 from discord.ext import commands
 from os.path import join, dirname
@@ -23,7 +24,7 @@ class Buy(commands.Cog):
         description="株を購入します"
     )
     @app_commands.guilds(guild_id)
-    async def buy(self, ctx:discord.Interaction, brand:str, amount:int):
+    async def buy(self, ctx:discord.Interaction, brand:Literal["Rise", "Swing"], amount:int):
         if ctx.user.id not in self.user_data:
             await ctx.response.send_message("まずはゲームに参加してください。", ephemeral=True)
         elif brand not in self.stock_prices:
