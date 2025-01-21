@@ -1,4 +1,11 @@
 # プレイヤーの情報と現在の株価を表示するコマンド
+    # コイン: xxxx枚
+    # 持ち株
+    # Rise: xx株
+    # Swing: xx株
+    # 株価
+    # Rise: xxxxコイン
+    # Swing: xxxxコイン
 import os
 import discord
 from discord import app_commands
@@ -23,17 +30,30 @@ class Show(commands.Cog):
         description="プレイヤーの情報と現在の株価を表示します"
     )
     @app_commands.guilds(guild_id)
-    async def show(self, ctx:discord.Interaction):
+    async def show(self, ctx:discord.Interaction, user:discord.User=None):
+        # ユーザー指定がある場合
+        if user is not None:
+            if user.id not in self.user_data:
+                await ctx.response.send_message("そのユーザーはゲームに参加していません。", ephemeral=True)
+            else:
+                msg = f"コイン: {self.user_data[user.id]['coins']:,}枚\n"
+                msg += "持ち株\n"
+                for brand, amount in self.user_data[user.id]["stocks"].items():
+                    msg += f"{brand}: {amount:,}株\n"
+                await ctx.response.send_message(msg, ephemeral=True)
+                return
+        
+        # ユーザー指定がない場合
         if ctx.user.id not in self.user_data:
-            await ctx.response.send_message("まずはゲームに参加してください。", ephemeral=True)
+            await ctx.response.send_message("まずはゲームに参加してください。\n`/join`で参加できます。", ephemeral=True)
         else:
-            msg = f"コイン: {self.user_data[ctx.user.id]['coins']}枚\n"
+            msg = f"コイン: {self.user_data[ctx.user.id]['coins']:,}枚\n"
             msg += "持ち株\n"
             for brand, amount in self.user_data[ctx.user.id]["stocks"].items():
-                msg += f"{brand}: {amount}株\n"
+                msg += f"{brand}: {amount:,}株\n"
             msg += "株価\n"
             for brand, price in self.stock_prices.items():
-                msg += f"{brand}: {price}コイン\n"
+                msg += f"{brand}: {price:,}コイン\n"
             
             await ctx.response.send_message(msg, ephemeral=True)
         return

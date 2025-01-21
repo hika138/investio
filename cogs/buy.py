@@ -1,6 +1,7 @@
 # 株を買うコマンド
 import os
 import discord
+from typing import Literal
 from discord import app_commands
 from discord.ext import commands
 from os.path import join, dirname
@@ -23,18 +24,18 @@ class Buy(commands.Cog):
         description="株を購入します"
     )
     @app_commands.guilds(guild_id)
-    async def buy(self, ctx:discord.Interaction, brand:str, amount:int):
+    async def buy(self, ctx:discord.Interaction, brand:Literal["Rise", "Swing"], amount:int):
         if ctx.user.id not in self.user_data:
             await ctx.response.send_message("まずはゲームに参加してください。", ephemeral=True)
         elif brand not in self.stock_prices:
             await ctx.response.send_message("その銘柄は存在しません。", ephemeral=True)
         elif amount <= 0:
             await ctx.response.send_message("1以上の数を入力してください。", ephemeral=True)
-        elif self.user_data[ctx.user.id]["coins"] < amount * self.stock_prices:
+        elif self.user_data[ctx.user.id]["coins"] < amount * self.stock_prices[brand]:
             await ctx.response.send_message("コインが足りません。", ephemeral=True)
         else:
-            self.user_data[ctx.user.id]["coins"] -= amount * self.stock_prices
-            self.user_data[ctx.user.id]["stocks"] += amount
+            self.user_data[ctx.user.id]["coins"] -= amount * self.stock_prices[brand]
+            self.user_data[ctx.user.id]["stocks"][brand] += amount
             await ctx.response.send_message(f"{amount}株購入しました。", ephemeral=True)
         return
 

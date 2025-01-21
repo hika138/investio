@@ -1,6 +1,7 @@
 # 株を売るコマンド
 import os
 import discord
+from typing import Literal
 from discord import app_commands
 from discord.ext import commands
 from os.path import join, dirname
@@ -23,7 +24,7 @@ class Sell(commands.Cog):
         description="株を売却します"
     )
     @app_commands.guilds(guild_id)
-    async def sell(self, ctx:discord.Interaction, brand:str, amount:int):
+    async def sell(self, ctx:discord.Interaction, brand:Literal["Rise", "Swing"], amount:int):
         if ctx.user.id not in self.user_data:
             await ctx.response.send_message("まずはゲームに参加してください。", ephemeral=True)
         elif brand not in self.stock_prices:
@@ -33,8 +34,8 @@ class Sell(commands.Cog):
         elif self.user_data[ctx.user.id]["stocks"] < amount:
             await ctx.response.send_message("株が足りません。", ephemeral=True)
         else:
-            self.user_data[ctx.user.id]["coins"] += amount * self.stock_prices
-            self.user_data[ctx.user.id]["stocks"] -= amount
+            self.user_data[ctx.user.id]["coins"] += amount * self.stock_prices[brand]
+            self.user_data[ctx.user.id]["stocks"][brand] -= amount
             await ctx.response.send_message(f"{amount}株売却しました。", ephemeral=True)
         return
 

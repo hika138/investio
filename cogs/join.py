@@ -1,6 +1,7 @@
 # ゲームに参加するコマンド
 import os
 import discord
+import copy
 from discord import app_commands
 from discord.ext import commands
 from os.path import join, dirname
@@ -16,8 +17,8 @@ class Join(commands.Cog):
         self.bot = bot
         
         self.user_data:dict = bot.user_data
-        self._user_init_coins:int = bot._user_init_coins
-        self._user_init_stocks:int = bot._user_init_stocks
+        self._user_init_coins:int = copy.deepcopy(bot._user_init_coins)
+        self._user_init_stocks:dict = copy.deepcopy(bot._user_init_stocks)
                     
     @app_commands.command(
         name="join",
@@ -26,7 +27,7 @@ class Join(commands.Cog):
     @app_commands.guilds(guild_id)
     async def join(self, ctx:discord.Interaction):
         if ctx.user.id not in self.user_data:
-            self.user_data[ctx.user.id] = {"coins":self._user_init_coins, "stocks":self._user_init_stocks}
+            self.user_data[ctx.user.id] = {"coins":copy.deepcopy(self._user_init_coins), "stocks":copy.deepcopy(self._user_init_stocks)}
             await ctx.response.send_message("ゲームに参加しました！", ephemeral=True)
         else:
             await ctx.response.send_message("あなたはすでにゲームに参加しています。", ephemeral=True)
