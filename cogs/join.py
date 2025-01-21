@@ -1,6 +1,7 @@
 # ゲームに参加するコマンド
 import os
 import discord
+import copy
 from discord import app_commands
 from discord.ext import commands
 from os.path import join, dirname
@@ -17,7 +18,7 @@ class Join(commands.Cog):
         
         self.user_data:dict = bot.user_data
         self._user_init_coins:int = bot._user_init_coins
-        self._user_init_stocks:int = bot._user_init_stocks
+        self._user_init_stocks:dict = copy.deepcopy(bot._user_init_stocks)
                     
     @app_commands.command(
         name="join",
