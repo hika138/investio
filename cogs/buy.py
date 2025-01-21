@@ -35,7 +35,7 @@ class Buy(commands.Cog):
             await ctx.response.send_message("コインが足りません。", ephemeral=True)
         else:
             self.user_data[ctx.user.id]["coins"] -= amount * self.stock_prices[brand]
-            self.user_data[ctx.user.id]["stocks"] += amount
+            self.user_data[ctx.user.id]["stocks"][brand] += amount
             await ctx.response.send_message(f"{amount}株購入しました。", ephemeral=True)
         return
 
