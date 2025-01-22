@@ -43,7 +43,6 @@ class Show(commands.Cog):
                 return
         
         # ユーザー指定がない場合
-        print(self.user_data)
         if str(ctx.user.id) not in self.user_data:
             await ctx.response.send_message("まずはゲームに参加してください。\n`/join`で参加できます。", ephemeral=True)
         else:
