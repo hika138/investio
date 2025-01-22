@@ -55,6 +55,7 @@ class investio(commands.Bot):
         await self.tree.sync(guild=self.guild)
         
         print("get on ready!")
+        await self.guild.get_channel(notify_channel_id).send("起動しました！")
         sys.stdout.flush()
         self.fluctuation.start()
         return
@@ -75,6 +76,7 @@ load_dotenv(dotenv_path)
 
 token = os.environ.get("TOKEN")
 guild_id = int(os.environ.get("GUILD_ID"))
+notify_channel_id = int(os.environ.get("NOTIFY_CHANNEL_ID"))
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
