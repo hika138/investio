@@ -3,6 +3,7 @@ import os
 import sys
 import random
 import json
+import datetime
 from discord.ext import commands, tasks
 from os.path import join, dirname
 from dotenv import load_dotenv
@@ -68,13 +69,19 @@ class investio(commands.Bot):
     
     @tasks.loop(hours=1)
     async def fluctuation(self):
-        for brand in self.stock_prices:
-            if brand == "Rise":
-                self.stock_prices[brand] += random.randint(-250, 500)
-            elif brand == "Swing":
-                self.stock_prices[brand] += random.randint(int(self.stock_prices[brand] * -0.5), int(self.stock_prices[brand] * 0.75))
-            if self.stock_prices[brand] <= 100:
-                self.stock_prices[brand] = 100
+        if datetime.datetime.now().minute == 0:
+            for brand in self.stock_prices:
+                if brand == "Rise":
+                    self.stock_prices[brand] += random.randint(-250, 500)
+                elif brand == "Swing":
+                    self.stock_prices[brand] += random.randint(int(self.stock_prices[brand] * -0.5), int(self.stock_prices[brand] * 0.75))
+                if self.stock_prices[brand] <= 100:
+                    self.stock_prices[brand] = 100
+            await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
+            msg = "現在のプレイヤー情報\n"
+            for user_id, data in self.user_data.items():
+                msg += f"{self.guild.get_member(int(user_id)).name}: {data['coins']:,}枚\n"
+            await self.guild.get_channel(update_channel_id).send(msg)
         return
 
 dotenv_path = join(dirname(__file__), '.env')
@@ -83,6 +90,7 @@ load_dotenv(dotenv_path)
 token = os.environ.get("TOKEN")
 guild_id = int(os.environ.get("GUILD_ID"))
 notify_channel_id = int(os.environ.get("NOTIFY_CHANNEL_ID"))
+update_channel_id = int(os.environ.get("UPDATE_CHANNEL_ID"))
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
