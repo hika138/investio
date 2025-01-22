@@ -39,18 +39,24 @@ class investio(commands.Bot):
         ]
         
     async def setup_hook(self):
-        for extension in self.initial_extensions:
-            await self.load_extension(extension)
-    
-    async def on_ready(self):
         # セーブデータの読み込み
-        if os.path.exists("./save/user_data.json"):
-            with open("./save/user_data.json", "r") as f:
+        if os.path.exists("./save/userdata.json"):
+            with open("./save/userdata.json", "r") as f:
+                self.user_data = json.load(f)
+        if os.path.exists("./save/stock_prices.json"):
+            with open("./save/stock_prices.json", "r") as f:
+                self.stock_prices = json.load(f)        # セーブデータの読み込み
+        if os.path.exists("./save/userdata.json"):
+            with open("./save/userdata.json", "r") as f:
                 self.user_data = json.load(f)
         if os.path.exists("./save/stock_prices.json"):
             with open("./save/stock_prices.json", "r") as f:
                 self.stock_prices = json.load(f)
-                
+        
+        for extension in self.initial_extensions:
+            await self.load_extension(extension)
+    
+    async def on_ready(self):
         self.guild = self.get_guild(guild_id)
         await self.tree.sync(guild=self.guild)
         

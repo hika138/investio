@@ -26,8 +26,8 @@ class Join(commands.Cog):
     )
     @app_commands.guilds(guild_id)
     async def join(self, ctx:discord.Interaction):
-        if ctx.user.id not in self.user_data:
-            self.user_data[ctx.user.id] = {"coins":copy.deepcopy(self._user_init_coins), "stocks":copy.deepcopy(self._user_init_stocks)}
+        if str(ctx.user.id) not in self.user_data:
+            self.user_data[str(ctx.user.id)] = {"coins":copy.deepcopy(self._user_init_coins), "stocks":copy.deepcopy(self._user_init_stocks)}
             await ctx.response.send_message("ゲームに参加しました！", ephemeral=True)
         else:
             await ctx.response.send_message("あなたはすでにゲームに参加しています。", ephemeral=True)
