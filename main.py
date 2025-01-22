@@ -44,7 +44,7 @@ class investio(commands.Bot):
     
     async def on_ready(self):
         # セーブデータの読み込み
-        if os.path.exists("./save/user_data.json"):
+        if os.path.exists("./save/userdata.json"):
             with open("./save/user_data.json", "r") as f:
                 self.user_data = json.load(f)
         if os.path.exists("./save/stock_prices.json"):
