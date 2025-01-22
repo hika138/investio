@@ -21,7 +21,6 @@ guild_id = int(os.environ.get("GUILD_ID"))
 class Show(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        
         self.user_data:dict = bot.user_data
         self.stock_prices:dict = bot.stock_prices
         
@@ -33,7 +32,7 @@ class Show(commands.Cog):
     async def show(self, ctx:discord.Interaction, user:discord.User=None):
         # ユーザー指定がある場合
         if user is not None:
-            if user.id not in self.user_data:
+            if str(user.id) not in self.user_data:
                 await ctx.response.send_message("そのユーザーはゲームに参加していません。", ephemeral=True)
             else:
                 msg = f"コイン: {self.user_data[user.id]['coins']:,}枚\n"
@@ -44,12 +43,13 @@ class Show(commands.Cog):
                 return
         
         # ユーザー指定がない場合
-        if ctx.user.id not in self.user_data:
+        print(self.user_data)
+        if str(ctx.user.id) not in self.user_data:
             await ctx.response.send_message("まずはゲームに参加してください。\n`/join`で参加できます。", ephemeral=True)
         else:
-            msg = f"コイン: {self.user_data[ctx.user.id]['coins']:,}枚\n"
+            msg = f"コイン: {self.user_data[str(ctx.user.id)]['coins']:,}枚\n"
             msg += "持ち株\n"
-            for brand, amount in self.user_data[ctx.user.id]["stocks"].items():
+            for brand, amount in self.user_data[str(ctx.user.id)]["stocks"].items():
                 msg += f"{brand}: {amount:,}株\n"
             msg += "株価\n"
             for brand, price in self.stock_prices.items():
