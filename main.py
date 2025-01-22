@@ -61,7 +61,7 @@ class investio(commands.Bot):
         await self.tree.sync(guild=self.guild)
         
         print("get on ready!")
-        #await self.guild.get_channel(notify_channel_id).send("起動しました！")
+        await self.guild.get_channel(notify_channel_id).send("起動しました！")
         sys.stdout.flush()
         self.fluctuation.start()
         return
