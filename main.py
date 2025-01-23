@@ -32,21 +32,18 @@ class investio(commands.Bot):
         
         # cogs
         self.initial_extensions = [
+            # ユーザー用
             "cogs.join",
             "cogs.buy",
             "cogs.sell",
             "cogs.show",
+            # 管理用
             "cogs.save",
+            "cogs.load",
         ]
         
     async def setup_hook(self):
         # セーブデータの読み込み
-        if os.path.exists("./save/userdata.json"):
-            with open("./save/userdata.json", "r") as f:
-                self.user_data = json.load(f)
-        if os.path.exists("./save/stock_prices.json"):
-            with open("./save/stock_prices.json", "r") as f:
-                self.stock_prices = json.load(f)        # セーブデータの読み込み
         if os.path.exists("./save/userdata.json"):
             with open("./save/userdata.json", "r") as f:
                 self.user_data = json.load(f)
