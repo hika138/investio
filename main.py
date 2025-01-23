@@ -67,7 +67,7 @@ class investio(commands.Bot):
         self.fluctuation.start()
         return
     
-    @tasks.loop(hours=1)
+    @tasks.loop(minutes=1)
     async def fluctuation(self):
         if datetime.datetime.now().minute == 0:
             for brand in self.stock_prices:
