@@ -35,9 +35,9 @@ class Show(commands.Cog):
             if str(user.id) not in self.user_data:
                 await ctx.response.send_message("そのユーザーはゲームに参加していません。", ephemeral=True)
             else:
-                msg = f"コイン: {self.user_data[user.id]['coins']:,}枚\n"
+                msg = f"コイン: {self.user_data[str(user.id)]['coins']:,}枚\n"
                 msg += "持ち株\n"
-                for brand, amount in self.user_data[user.id]["stocks"].items():
+                for brand, amount in self.user_data[str(user.id)]["stocks"].items():
                     msg += f"{brand}: {amount:,}株\n"
                 await ctx.response.send_message(msg, ephemeral=True)
                 return
