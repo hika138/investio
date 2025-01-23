@@ -5,6 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 from os.path import join, dirname
 from dotenv import load_dotenv
+import copy
 import json
 
 # 環境変数の取得
@@ -26,13 +27,13 @@ class Load(commands.Cog):
         msg = ""
         if os.path.exists("./save/userdata.json"):
             with open("./save/userdata.json", "r") as f:
-                self.bot.user_data = json.load(f)
+                self.bot.user_data = copy.copy(json.load(f))
             msg += "ユーザーデータをロードしました。\n"
         else:
             msg += "userdata.jsonが見つかりませんでした。\n"
         if os.path.exists("./save/stock_prices.json"):
             with open("./save/stock_prices.json", "r") as f:
-                self.bot.stock_prices = json.load(f)
+                self.bot.stock_prices = copy.copy(json.load(f))
             msg += "株価をロードしました。"
         else:
             msg += "stock_prices.jsonが見つかりませんでした。"
