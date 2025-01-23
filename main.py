@@ -74,29 +74,30 @@ class investio(commands.Bot):
                     self.stock_prices[brand] += random.randint(int(self.stock_prices[brand] * -0.5), int(self.stock_prices[brand] * 0.5))
                 if self.stock_prices[brand] <= 100:
                     self.stock_prices[brand] = 100
-            await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
-            
-            # 通知用のEmbedを作成
-            stock_info = ""
-            for brand in self.stock_prices:
-                stock_info += f"{brand}: {self.stock_prices[brand]:,}\n"
-            
-            user_info = ""
-            for user_id in self.user_data:
-                user = self.guild.get_member(int(user_id))
-                user_info += f"{user.display_name}: {self.user_data[user_id]['coins']:,}\n"
-            
-            embed = discord.Embed(title="Infomation",
-                      description="株価とプレイヤー情報を通知します。",
-                      colour=0x00b0f4,
-                      timestamp=datetime.datetime.now())
-            embed.add_field(name="株価",
-                            value=stock_info,
-                            inline=True)
-            embed.add_field(name="プレイヤー",
-                            value=user_info,
-                            inline=True)
-            await self.guild.get_channel(update_channel_id).send(embed=embed)
+            if (21 <= datetime.datetime.now().hour) or (0 <= datetime.datetime.now().hour < 9):
+                await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
+                
+                # 通知用のEmbedを作成
+                stock_info = ""
+                for brand in self.stock_prices:
+                    stock_info += f"{brand}: {self.stock_prices[brand]:,}\n"
+                
+                user_info = ""
+                for user_id in self.user_data:
+                    user = self.guild.get_member(int(user_id))
+                    user_info += f"{user.display_name}: {self.user_data[user_id]['coins']:,}\n"
+                
+                embed = discord.Embed(title="Infomation",
+                        description="株価とプレイヤー情報を通知します。",
+                        colour=0x00b0f4,
+                        timestamp=datetime.datetime.now())
+                embed.add_field(name="株価",
+                                value=stock_info,
+                                inline=True)
+                embed.add_field(name="プレイヤー",
+                                value=user_info,
+                                inline=True)
+                await self.guild.get_channel(update_channel_id).send(embed=embed)
             
         return
 
