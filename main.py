@@ -27,7 +27,7 @@ class investio(commands.Bot):
                                 }
         
         # ユーザーの情報を保存する辞書 
-        # {str(discord.User.id): {"coins": int, "stocks": dict{"brand": int, "amount": int}}}
+        # {str(discord.User.id): {"coins": int, "stocks": {"brand": int, "amount": int}}}
         self.user_data:dict= {}
         
         # cogs
