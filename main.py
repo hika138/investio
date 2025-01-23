@@ -82,12 +82,12 @@ class investio(commands.Bot):
             # 通知用のEmbedを作成
             stock_info = ""
             for brand in self.stock_prices:
-                stock_info += f"{brand}: {self.stock_prices[brand]}\n"
+                stock_info += f"{brand}: {self.stock_prices[brand]:,}\n"
             
             user_info = ""
             for user_id in self.user_data:
                 user = self.guild.get_member(int(user_id))
-                user_info += f"{user.display_name}: {self.user_data[user_id]['coins']}\n"
+                user_info += f"{user.display_name}: {self.user_data[user_id]['coins']:,}\n"
             
             embed = discord.Embed(title="Infomation",
                       description="株価とプレイヤー情報を通知します。",
