@@ -74,7 +74,7 @@ class investio(commands.Bot):
                 if brand == "Rise":
                     self.stock_prices[brand] += random.randint(-250, 500)
                 elif brand == "Swing":
-                    self.stock_prices[brand] += random.randint(int(self.stock_prices[brand] * -0.5), int(self.stock_prices[brand] * 0.75))
+                    self.stock_prices[brand] += random.randint(int(self.stock_prices[brand] * -0.5), int(self.stock_prices[brand] * 0.5))
                 if self.stock_prices[brand] <= 100:
                     self.stock_prices[brand] = 100
             await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
