@@ -24,17 +24,20 @@ class Load(commands.Cog):
     )
     @app_commands.guilds(guild_id)
     async def load(self, ctx:discord.Interaction):
-        # 株価とプレイヤーの情報を保存
+        # 株価とプレイヤーの情報を
+        msg = ""
         if os.path.exists("./save/userdata.json"):
             with open("./save/userdata.json", "r") as f:
                 self.user_data = json.load(f)
-            await ctx.response.send_message("ユーザーデータをロードしました。", ephemeral=True)
+            msg += "ユーザーデータをロードしました。\n"
         else:
             await ctx.response.send_message("user_data.jsonが見つかりませんでした。", ephemeral=True)
         if os.path.exists("./save/stock_prices.json"):
             with open("./save/stock_prices.json", "r") as f:
                 self.stock_prices = json.load(f)
-            await ctx.response.send_message("株価をロードしました。", ephemeral=True)
+            msg += "株価をロードしました。"
+        if msg != "":
+            await ctx.response.send_message(msg, ephemeral=True)
         else:
             await ctx.response.send_message("stock_prices.jsonが見つかりませんでした。", ephemeral=True)
         

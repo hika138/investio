@@ -27,7 +27,7 @@ class investio(commands.Bot):
                                 }
         
         # ユーザーの情報を保存する辞書 
-        # {str(discord.User.id): {"coins": int, "stocks": dict{"brand": int, "amount": int}}}
+        # {str(discord.User.id): {"coins": int, "stocks": {"brand": int, "amount": int}}}
         self.user_data:dict= {}
         
         # cogs
@@ -74,7 +74,7 @@ class investio(commands.Bot):
                     self.stock_prices[brand] += random.randint(int(self.stock_prices[brand] * -0.5), int(self.stock_prices[brand] * 0.5))
                 if self.stock_prices[brand] <= 100:
                     self.stock_prices[brand] = 100
-            if (21 <= datetime.datetime.now().hour) or (0 <= datetime.datetime.now().hour < 9):
+            if not((21 <= datetime.datetime.now().hour<=23) or (0 <= datetime.datetime.now().hour < 9)):
                 await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
                 
                 # 通知用のEmbedを作成
