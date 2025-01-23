@@ -92,7 +92,7 @@ class investio(commands.Bot):
             embed = discord.Embed(title="Infomation",
                       description="株価とプレイヤー情報を通知します。",
                       colour=0x00b0f4,
-                      timestamp=datetime.now())
+                      timestamp=datetime.datetime.now())
             embed.add_field(name="株価",
                             value=stock_info,
                             inline=True)
