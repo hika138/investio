@@ -27,7 +27,7 @@ class investio(commands.Bot):
                                 }
         
         # ユーザーの情報を保存する辞書 
-        # {discord.User.id: {"coins": int, "stocks": dict{"brand": int, "amount": int}}}
+        # {str(discord.User.id): {"coins": int, "stocks": dict{"brand": int, "amount": int}}}
         self.user_data:dict= {}
         
         # cogs
@@ -74,14 +74,33 @@ class investio(commands.Bot):
                 if brand == "Rise":
                     self.stock_prices[brand] += random.randint(-250, 500)
                 elif brand == "Swing":
-                    self.stock_prices[brand] += random.randint(int(self.stock_prices[brand] * -0.5), int(self.stock_prices[brand] * 0.75))
+                    self.stock_prices[brand] += random.randint(int(self.stock_prices[brand] * -0.5), int(self.stock_prices[brand] * 0.5))
                 if self.stock_prices[brand] <= 100:
                     self.stock_prices[brand] = 100
             await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
-            msg = "現在のプレイヤー情報\n"
-            for user_id, data in self.user_data.items():
-                msg += f"{self.guild.get_member(int(user_id)).name}: {data['coins']:,}枚\n"
-            await self.guild.get_channel(update_channel_id).send(msg)
+            
+            # 通知用のEmbedを作成
+            stock_info = ""
+            for brand in self.stock_prices:
+                stock_info += f"{brand}: {self.stock_prices[brand]}\n"
+            
+            user_info = ""
+            for user_id in self.user_data:
+                user = self.guild.get_member(int(user_id))
+                user_info += f"{user.display_name}: {self.user_data[user_id]['coins']}\n"
+            
+            embed = discord.Embed(title="Infomation",
+                      description="株価とプレイヤー情報を通知します。",
+                      colour=0x00b0f4,
+                      timestamp=datetime.now())
+            embed.add_field(name="株価",
+                            value=stock_info,
+                            inline=True)
+            embed.add_field(name="プレイヤー",
+                            value=user_info,
+                            inline=True)
+            await self.guild.get_channel(update_channel_id).send(embed=embed)
+            
         return
 
 dotenv_path = join(dirname(__file__), '.env')
