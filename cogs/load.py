@@ -31,15 +31,19 @@ class Load(commands.Cog):
                 self.user_data = json.load(f)
             msg += "ユーザーデータをロードしました。\n"
         else:
-            await ctx.response.send_message("user_data.jsonが見つかりませんでした。", ephemeral=True)
+            msg += "userdata.jsonが見つかりませんでした。\n"
         if os.path.exists("./save/stock_prices.json"):
             with open("./save/stock_prices.json", "r") as f:
                 self.stock_prices = json.load(f)
             msg += "株価をロードしました。"
+        else:
+            msg += "stock_prices.jsonが見つかりませんでした。"
+        
         if msg != "":
             await ctx.response.send_message(msg, ephemeral=True)
         else:
             await ctx.response.send_message("stock_prices.jsonが見つかりませんでした。", ephemeral=True)
+        return
         
         
 async def setup(bot: commands.Bot):
