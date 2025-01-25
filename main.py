@@ -17,14 +17,14 @@ class investio(commands.Bot):
         )
         # 初期値
         self._user_init_coins:int = 10000
-        self._user_init_stocks:dict = {"Rise": 0, 
-                                       "Swing": 0,
-                                    }
-        
-        # 株価
-        self.stock_prices:dict = {"Rise": 1000, 
-                                   "Swing": 1000,
-                                }
+        self._user_init_stocks:dict = {
+            "Rise": 0, 
+            "Swing": 0,
+        }
+        self.stock_prices:dict = {
+            "Rise": 1000, 
+            "Swing": 1000,
+        }
         
         # ユーザーの情報を保存する辞書 
         # {str(discord.User.id): {"coins": int, "stocks": {"brand": int, "amount": int}}}
@@ -59,8 +59,8 @@ class investio(commands.Bot):
         await self.tree.sync(guild=self.guild)
         
         print("get on ready!")
-        await self.guild.get_channel(notify_channel_id).send("起動しました！")
         sys.stdout.flush()
+        await self.guild.get_channel(notify_channel_id).send("起動しました！")
         self.fluctuation.start()
         return
     
