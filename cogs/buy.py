@@ -1,6 +1,7 @@
 # 株を買うコマンド
 import os
 import discord
+import sqlite3
 from typing import Literal
 from discord import app_commands
 from discord.ext import commands
@@ -15,28 +16,43 @@ guild_id = int(os.environ.get("GUILD_ID"))
 class Buy(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        
-        self.user_data = bot.user_data
-        self.stock_prices = bot.stock_prices
-        
+        self.database:sqlite3.Connection = bot.database
+                
     @app_commands.command(
         name="buy",
         description="株を購入します"
     )
     @app_commands.guilds(guild_id)
     async def buy(self, ctx:discord.Interaction, brand:Literal["Rise", "Swing"], amount:int):
-        if str(ctx.user.id) not in self.user_data:
-            await ctx.response.send_message("まずはゲームに参加してください。", ephemeral=True)
-        elif brand not in self.stock_prices:
+        # ユーザーデータの取得
+        cursor = self.database.cursor()
+        cursor.execute("SELECT * FROM user_coins WHERE user_id=?", (ctx.user.id,))
+        if cursor.fetchone() is None:
+            await ctx.response.send_message("まずはjoinコマンドで参加してください。", ephemeral=True)
+            return
+        
+        if amount <= 0:
+            await ctx.response.send_message("購入数は1以上で指定してください。", ephemeral=True)
+        
+        # 株価の取得
+        cursor.execute("SELECT price FROM stocks WHERE name=?", (brand,))
+        stock_price = cursor.fetchone()[0]
+        if stock_price is None:
             await ctx.response.send_message("その銘柄は存在しません。", ephemeral=True)
-        elif amount <= 0:
-            await ctx.response.send_message("1以上の数を入力してください。", ephemeral=True)
-        elif self.user_data[str(ctx.user.id)]["coins"] < amount * self.stock_prices[brand]:
+            return
+        # 所持金の取得
+        cursor.execute("SELECT amount FROM user_coins WHERE user_id=?", (ctx.user.id,))
+        coins = cursor.fetchone()[0]
+        if coins < stock_price * amount:
             await ctx.response.send_message("コインが足りません。", ephemeral=True)
-        else:
-            self.user_data[str(ctx.user.id)]["coins"] -= amount * self.stock_prices[brand]
-            self.user_data[str(ctx.user.id)]["stocks"][brand] += amount
-            await ctx.response.send_message(f"{amount}株購入しました。", ephemeral=True)
+            return
+        # 株の購入
+        if cursor.execute("SELECT * FROM user_stocks WHERE user_id=? and brand=?", (ctx.user.id, brand)).fetchone() is None:
+            cursor.execute("INSERT INTO user_stocks (user_id, brand, amount) VALUES (?, ?, 0)", (ctx.user.id, brand))
+        cursor.execute("UPDATE user_coins SET amount=amount - ? WHERE user_id=?", (stock_price * amount, ctx.user.id))
+        cursor.execute("UPDATE user_stocks SET amount=amount + ? WHERE user_id=? and brand=?", (amount, ctx.user.id, brand))
+        self.database.commit()
+        await ctx.response.send_message(f"{brand}を{amount}株購入しました。", ephemeral=True)
         return
 
 async def setup(bot: commands.Bot):

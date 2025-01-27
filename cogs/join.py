@@ -1,7 +1,7 @@
 # ゲームに参加するコマンド
 import os
 import discord
-import copy
+import sqlite3
 from discord import app_commands
 from discord.ext import commands
 from os.path import join, dirname
@@ -16,9 +16,9 @@ class Join(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         
-        self.user_data:dict = bot.user_data
-        self._user_init_coins:int = copy.deepcopy(bot._user_init_coins)
-        self._user_init_stocks:dict = copy.deepcopy(bot._user_init_stocks)
+        self.database:sqlite3.Connection = bot.database
+        self._user_init_coins:int = bot._user_init_coins
+        self._user_init_stocks:dict = bot._user_init_stocks
                     
     @app_commands.command(
         name="join",
@@ -26,12 +26,18 @@ class Join(commands.Cog):
     )
     @app_commands.guilds(guild_id)
     async def join(self, ctx:discord.Interaction):
-        if str(ctx.user.id) not in self.user_data:
-            self.user_data[str(ctx.user.id)] = {"coins":copy.deepcopy(self._user_init_coins), "stocks":copy.deepcopy(self._user_init_stocks)}
+        cursor = self.database.cursor()
+        cursor.execute("SELECT * FROM user_coins WHERE user_id=?", (ctx.user.id,))
+        if cursor.fetchone() is None:
+            cursor.execute("INSERT INTO user_coins (user_id, amount) VALUES (?, ?)", (ctx.user.id, self._user_init_coins))
+            for brand, amount in self._user_init_stocks.items():
+                cursor.execute("INSERT INTO user_stocks (user_id, brand, amount) VALUES (?, ?, ?)", (ctx.user.id, brand, amount))
+            self.database.commit()
             await ctx.response.send_message("ゲームに参加しました！", ephemeral=True)
+            return
         else:
             await ctx.response.send_message("あなたはすでにゲームに参加しています。", ephemeral=True)
-        return
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Join(bot))
