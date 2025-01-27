@@ -8,6 +8,7 @@
     # Swing: xxxxコイン
 import os
 import discord
+import sqlite3
 from discord import app_commands
 from discord.ext import commands
 from os.path import join, dirname
@@ -21,8 +22,7 @@ guild_id = int(os.environ.get("GUILD_ID"))
 class Show(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.user_data:dict = bot.user_data
-        self.stock_prices:dict = bot.stock_prices
+        self.database:sqlite3.Connection = bot.database
         
     @app_commands.command(
         name="show",
@@ -30,32 +30,52 @@ class Show(commands.Cog):
     )
     @app_commands.guilds(guild_id)
     async def show(self, ctx:discord.Interaction, user:discord.User=None):
+        cursor = self.database.cursor()
         # ユーザー指定がある場合
         if user is not None:
-            if str(user.id) not in self.user_data:
+            cursor.execute("SELECT amount FROM user_coins WHERE user_id=?", (user.id,))
+            user_coins = cursor.fetchone()
+            if user_coins is None:
                 await ctx.response.send_message("そのユーザーはゲームに参加していません。", ephemeral=True)
-            else:
-                msg = f"コイン: {self.user_data[str(user.id)]['coins']:,}枚\n"
-                msg += "持ち株\n"
-                for brand, amount in self.user_data[str(user.id)]["stocks"].items():
-                    msg += f"{brand}: {amount:,}株\n"
-                await ctx.response.send_message(msg, ephemeral=True)
                 return
+            cursor.execute("SELECT brand, amount FROM user_stocks WHERE user_id=?", (user.id,))
+            user_stocks = cursor.fetchall()
+            cursor.execute("SELECT name, price FROM stocks")
+            stocks = cursor.fetchall()
+            msg = ""
+            msg += f"{user.mention}の情報\n"
+            msg += f"コイン: {user_coins[0]:,}枚\n"
+            msg += "\n持ち株\n"
+            for stock in user_stocks:
+                msg += f"{stock[0]}: {stock[1]:,}株\n"
+            msg += "\n株価\n"
+            for stock in stocks:
+                msg += f"{stock[0]}: {stock[1]:,}コイン\n"
+            await ctx.response.send_message(msg, ephemeral=True)
+            return
         
         # ユーザー指定がない場合
-        if str(ctx.user.id) not in self.user_data:
-            await ctx.response.send_message("まずはゲームに参加してください。\n`/join`で参加できます。", ephemeral=True)
         else:
-            msg = f"コイン: {self.user_data[str(ctx.user.id)]['coins']:,}枚\n"
-            msg += "持ち株\n"
-            for brand, amount in self.user_data[str(ctx.user.id)]["stocks"].items():
-                msg += f"{brand}: {amount:,}株\n"
-            msg += "株価\n"
-            for brand, price in self.stock_prices.items():
-                msg += f"{brand}: {price:,}コイン\n"
-            
+            cursor.execute("SELECT amount FROM user_coins WHERE user_id=?", (ctx.user.id,))
+            user_coins = cursor.fetchone()
+            if user_coins is None:
+                await ctx.response.send_message("まずはjoinコマンドで参加してください。", ephemeral=True)
+                return
+            cursor.execute("SELECT brand, amount FROM user_stocks WHERE user_id=?", (ctx.user.id,))
+            user_stocks = cursor.fetchall()
+            cursor.execute("SELECT name, price FROM stocks")
+            stocks = cursor.fetchall()
+            msg = ""
+            msg += f"あなたの情報\n"
+            msg += f"コイン: {user_coins[0]:,}枚\n"
+            msg += "\n持ち株\n"
+            for stock in user_stocks:
+                msg += f"{stock[0]}: {stock[1]:,}株\n"
+            msg += "\n株価\n"
+            for stock in stocks:
+                msg += f"{stock[0]}: {stock[1]:,}コイン\n"
             await ctx.response.send_message(msg, ephemeral=True)
-        return
+            return
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Show(bot))

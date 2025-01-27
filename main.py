@@ -1,9 +1,8 @@
 import discord
 import os
-import sys
 import random
-import json
 import datetime
+import sqlite3
 from discord.ext import commands, tasks
 from os.path import join, dirname
 from dotenv import load_dotenv
@@ -21,15 +20,9 @@ class investio(commands.Bot):
             "Rise": 0, 
             "Swing": 0,
         }
-        self.stock_prices:dict = {
-            "Rise": 1000, 
-            "Swing": 1000,
-        }
-        
-        # ユーザーの情報を保存する辞書 
-        # {str(discord.User.id): {"coins": int, "stocks": {"brand": int, "amount": int}}}
-        self.user_data:dict= {}
-        
+        self.stock_brands:list = ["Rise", "Swing"]
+        self.database:sqlite3.Connection = None
+                
         # cogs
         self.initial_extensions = [
             # ユーザー用
@@ -37,20 +30,12 @@ class investio(commands.Bot):
             "cogs.buy",
             "cogs.sell",
             "cogs.show",
-            # 管理用
-            "cogs.save",
-            "cogs.load",
+            # 管理者用
+            
         ]
         
     async def setup_hook(self):
-        # セーブデータの読み込み
-        if os.path.exists("./save/userdata.json"):
-            with open("./save/userdata.json", "r") as f:
-                self.user_data = json.load(f)
-        if os.path.exists("./save/stock_prices.json"):
-            with open("./save/stock_prices.json", "r") as f:
-                self.stock_prices = json.load(f)
-        
+        self.database = sqlite3.connect("./save/save.db")   
         for extension in self.initial_extensions:
             await self.load_extension(extension)
     
@@ -58,35 +43,41 @@ class investio(commands.Bot):
         self.guild = self.get_guild(guild_id)
         await self.tree.sync(guild=self.guild)
         
+        # 開始通知
         print("get on ready!")
-        sys.stdout.flush()
         await self.guild.get_channel(notify_channel_id).send("起動しました！")
+        
+        # 株価の変動を開始
         self.fluctuation.start()
         return
     
     @tasks.loop(minutes=1)
     async def fluctuation(self):
         if datetime.datetime.now().minute == 0:
-            for brand in self.stock_prices:
+            cursor = self.database.cursor()
+            for brand in self.stock_brands:
                 if brand == "Rise":
-                    self.stock_prices[brand] += random.randint(-250, 500)
+                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(-250, 500), brand))
                 elif brand == "Swing":
-                    self.stock_prices[brand] += random.randint(int(self.stock_prices[brand] * -0.5), int(self.stock_prices[brand] * 0.5))
-                if self.stock_prices[brand] <= 100:
-                    self.stock_prices[brand] = 100
+                    stock_price = cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,)).fetchone()[0]
+                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(int(stock_price * -0.5), int(stock_price * 0.5)), brand)) 
+                if cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,)).fetchone()[0] < 100:
+                    cursor.execute("UPDATE stocks SET price = 100 WHERE name = ?", (brand,))
+            self.database.commit()
             
             if (9 <= datetime.datetime.now().hour <= 21):
                 await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
                 
                 # 通知用のEmbedを作成
                 stock_info = ""
-                for brand in self.stock_prices:
-                    stock_info += f"{brand}: {self.stock_prices[brand]:,}\n"
+                
+                cursor.execute("SELECT * FROM stocks")
+                for row in cursor.fetchall():
+                    stock_info += f"{row[1]}: {row[2]:,}\n"
                 
                 user_info = ""
-                for user_id in self.user_data:
-                    user = self.guild.get_member(int(user_id))
-                    user_info += f"{user.display_name}: {self.user_data[user_id]['coins']:,}\n"
+                
+                cursor.execute("SELECT * FROM user_coins")
                 
                 embed = discord.Embed(title="Infomation",
                         description="株価とプレイヤー情報を通知します。",
