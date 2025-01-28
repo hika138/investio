@@ -76,6 +76,9 @@ class investio(commands.Bot):
                     stock_info += f"{row[1]}: {row[2]:,}\n"
                 
                 user_info = ""
+                cursor.execute("SELECT * FROM user_coins")
+                for row in cursor.fetchall():
+                    user_info += f"{row[0]}: {row[1]:,}\n"
                 
                 cursor.execute("SELECT * FROM user_coins")
                 
