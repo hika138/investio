@@ -53,7 +53,7 @@ class investio(commands.Bot):
     
     @tasks.loop(minutes=1)
     async def fluctuation(self):
-        if datetime.datetime.now().minute == 0:
+        if datetime.datetime.now().minute != 0:
             cursor = self.database.cursor()
             for brand in self.stock_brands:
                 if brand == "Rise":
@@ -65,7 +65,7 @@ class investio(commands.Bot):
                     cursor.execute("UPDATE stocks SET price = 100 WHERE name = ?", (brand,))
             self.database.commit()
                 
-            if (9 <= datetime.datetime.now().hour <= 21):
+            if (0 <= datetime.datetime.now().hour <= 21):
                 await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
                 
                 # 通知用のEmbedを作成
@@ -78,7 +78,8 @@ class investio(commands.Bot):
                 user_info = ""
                 cursor.execute("SELECT * FROM user_coins")
                 for row in cursor.fetchall():
-                    user_info += f"{discord.Guild.get_member(row[1])}: {row[2]:,}\n"
+                    print(row[1])
+                    user_info += f"{self.guild.get_member(row[1])}: {row[2]:,}\n"
                 
                 cursor.execute("SELECT * FROM user_coins")
                 
