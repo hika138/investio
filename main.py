@@ -78,7 +78,7 @@ class investio(commands.Bot):
                 user_info = ""
                 cursor.execute("SELECT * FROM user_coins")
                 for row in cursor.fetchall():
-                    user_info += f"{row[0]}: {row[1]:,}\n"
+                    user_info += f"{discord.Guild.get_member(row[1])}: {row[2]:,}\n"
                 
                 cursor.execute("SELECT * FROM user_coins")
                 
