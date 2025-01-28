@@ -60,7 +60,7 @@ class investio(commands.Bot):
                     cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(-250, 500), brand))
                 elif brand == "Swing":
                     stock_price = cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,)).fetchone()[0]
-                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (-random.randint(int(stock_price)/2, int(stock_price))/2, brand)) 
+                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(-int(stock_price)/2, int(stock_price))/2, brand)) 
                 if cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,)).fetchone()[0] < 100:
                     cursor.execute("UPDATE stocks SET price = 100 WHERE name = ?", (brand,))
             self.database.commit()
