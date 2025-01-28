@@ -36,10 +36,10 @@ class Sell(commands.Cog):
             return
         # 株価の取得
         cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,))
-        if cursor.fetchone() is None:
+        stock_price = cursor.fetchone()[0]
+        if stock_price is None:
             await ctx.response.send_message("その銘柄は存在しません。", ephemeral=True)
             return
-        stock_price = cursor.fetchone()[0]
         # 所持株の確認
         cursor.execute("SELECT amount FROM user_stocks WHERE user_id=? and brand=?", (ctx.user.id, brand,))
         if cursor.fetchone()[0] < amount:
