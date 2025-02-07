@@ -1,6 +1,7 @@
 import discord
 import os
 import random
+import math
 import datetime
 import sqlite3
 from discord.ext import commands, tasks
@@ -31,11 +32,11 @@ class investio(commands.Bot):
             "cogs.sell",
             "cogs.show",
             # 管理者用
-            
+            "cogs.set",
         ]
         
     async def setup_hook(self):
-        self.database = sqlite3.connect("./save/save.db")   
+        self.database = sqlite3.connect("./save/save.db")
         for extension in self.initial_extensions:
             await self.load_extension(extension)
     
@@ -53,19 +54,20 @@ class investio(commands.Bot):
     
     @tasks.loop(minutes=1)
     async def fluctuation(self):
-        if datetime.datetime.now().minute != 0:
+        if datetime.datetime.now().minute == 0:
             cursor = self.database.cursor()
             for brand in self.stock_brands:
                 if brand == "Rise":
-                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(-250, 500), brand))
+                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(-50, 100), brand))
                 elif brand == "Swing":
                     stock_price = cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,)).fetchone()[0]
-                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(-int(stock_price/2), int(stock_price*2)), brand))
+                    increase = int(stock_price*math.sin(math.radians(datetime.datetime.now().hour%24*30))+5000 + random.randint(-5000, 5000))
+                    cursor.execute("UPDATE stocks SET price = ? WHERE name = ?", (increase, brand))
                 if cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,)).fetchone()[0] < 100:
                     cursor.execute("UPDATE stocks SET price = 100 WHERE name = ?", (brand,))
             self.database.commit()
                 
-            if (0 <= datetime.datetime.now().hour <= 21):
+            if (9 <= datetime.datetime.now().hour <= 21):
                 await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
                 
                 # 通知用のEmbedを作成
