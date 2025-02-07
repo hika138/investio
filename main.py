@@ -32,11 +32,11 @@ class investio(commands.Bot):
             "cogs.sell",
             "cogs.show",
             # 管理者用
-            
+            "cogs.set",
         ]
         
     async def setup_hook(self):
-        self.database = sqlite3.connect("./save/save.db")   
+        self.database = sqlite3.connect("./save/save.db")
         for extension in self.initial_extensions:
             await self.load_extension(extension)
     
