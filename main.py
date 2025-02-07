@@ -58,7 +58,7 @@ class investio(commands.Bot):
             cursor = self.database.cursor()
             for brand in self.stock_brands:
                 if brand == "Rise":
-                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(-250, 500), brand))
+                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(-50, 100), brand))
                 elif brand == "Swing":
                     stock_price = cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,)).fetchone()[0]
                     increase = int(stock_price*math.sin(math.radians(datetime.datetime.now().hour%24*30))+5000 + random.randint(-5000, 5000))
