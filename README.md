@@ -16,7 +16,7 @@
 | join | ゲームに参加する。10000コインをもらう。 |
 | buy `[brand]` `[amount]` | [brand]の株を[amount]株だけ買う。 |
 | sell `[brand]` `[amount]` | [brand]の株を[amount]株だけ売る。 |
-| show `optional[user]`| 株価とプレイヤー情報を表示する。 ![image](https://github.com/user-attachments/assets/f30bfe1a-87c7-4c66-a10f-dede4a65139e)|
+| show `optional[user]`| 株価とプレイヤー情報を表示する。 <br> <img src="https://github.com/user-attachments/assets/f30bfe1a-87c7-4c66-a10f-dede4a65139e" width="300">|
 
 ### 管理者向けコマンド
 | コマンド | 機能 |
