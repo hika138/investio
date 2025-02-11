@@ -31,6 +31,7 @@ class investio(commands.Bot):
             "cogs.buy",
             "cogs.sell",
             "cogs.show",
+            
             # 管理者用
             "cogs.set",
         ]
@@ -95,17 +96,17 @@ class investio(commands.Bot):
                 embed.add_field(name="プレイヤー",
                                 value=user_info,
                                 inline=True)
-                await self.guild.get_channel(update_channel_id).send(embed=embed)
-            
+                await self.guild.get_channel(update_channel_id).send(embed=embed)        
         return
 
+# 環境変数の取得
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
-
 token = os.environ.get("TOKEN")
 guild_id = int(os.environ.get("GUILD_ID"))
 notify_channel_id = int(os.environ.get("NOTIFY_CHANNEL_ID"))
 update_channel_id = int(os.environ.get("UPDATE_CHANNEL_ID"))
+
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
