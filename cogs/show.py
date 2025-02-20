@@ -40,7 +40,7 @@ class Show(commands.Cog):
                 return
             cursor.execute("SELECT brand, amount FROM user_stocks WHERE user_id=?", (user.id,))
             user_stocks = cursor.fetchall()
-            cursor.execute("SELECT name, price FROM stocks")
+            cursor.execute("SELECT brand, price FROM stocks")
             stocks = cursor.fetchall()
             msg = ""
             msg += f"{user.mention}の情報\n"
@@ -63,7 +63,7 @@ class Show(commands.Cog):
                 return
             cursor.execute("SELECT brand, amount FROM user_stocks WHERE user_id=?", (ctx.user.id,))
             user_stocks = cursor.fetchall()
-            cursor.execute("SELECT name, price FROM stocks")
+            cursor.execute("SELECT brand, price FROM stocks")
             stocks = cursor.fetchall()
             msg = ""
             msg += f"あなたの情報\n"

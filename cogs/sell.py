@@ -35,7 +35,7 @@ class Sell(commands.Cog):
             await ctx.response.send_message("売却数は1以上で指定してください。", ephemeral=True)
             return
         # 株価の取得
-        cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,))
+        cursor.execute("SELECT price FROM stocks WHERE brand=?", (brand,))
         stock_price = cursor.fetchone()[0]
         if stock_price is None:
             await ctx.response.send_message("その銘柄は存在しません。", ephemeral=True)

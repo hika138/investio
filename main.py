@@ -49,6 +49,22 @@ class investio(commands.Bot):
         print("get on ready!")
         await self.guild.get_channel(notify_channel_id).send("起動しました！")
         
+        # テーブルの作成
+        cursor = self.database.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS user_coins (user_id INTEGER, amount INTEGER)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS user_stocks (user_id INTEGER, brand TEXT, amount INTEGER)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS stocks (brand TEXT PRIMARY KEY, price INTEGER)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY AUTOINCREMENT, brand TEXT, price INTEGER, time TEXT)")
+        self.database.commit()
+        # 銘柄の初期化
+        cursor.execute("DELETE FROM stocks")
+        for brand in self.stock_brands:
+            cursor.execute("INSERT INTO stocks VALUES (?, ?)", (brand, 1000))
+            
+        # 履歴の初期化
+        cursor.execute("DELETE FROM history")
+        self.database.commit()
+        
         # 株価の変動を開始
         self.fluctuation.start()
         return
@@ -58,14 +74,17 @@ class investio(commands.Bot):
         if datetime.datetime.now().minute == 0:
             cursor = self.database.cursor()
             for brand in self.stock_brands:
+                increase = 0
                 if brand == "Rise":
-                    cursor.execute("UPDATE stocks SET price = price + ? WHERE name = ?", (random.randint(-50, 100), brand))
+                    increase = random.randint(-50, 100)
+                    cursor.execute("UPDATE stocks SET price=price+? WHERE brand=?", (increase, brand))
                 elif brand == "Swing":
-                    stock_price = cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,)).fetchone()[0]
-                    increase = int(stock_price*math.sin(math.radians(datetime.datetime.now().hour*30))+5000 + random.randint(-5000, 5000))
-                    cursor.execute("UPDATE stocks SET price = ? WHERE name = ?", (increase, brand))
-                if cursor.execute("SELECT price FROM stocks WHERE name = ?", (brand,)).fetchone()[0] < 100:
-                    cursor.execute("UPDATE stocks SET price = 100 WHERE name = ?", (brand,))
+                    stock_price = cursor.execute("SELECT price FROM stocks WHERE brand=?", (brand,)).fetchone()[0]
+                    increase = int(1000*(math.sin((datetime.datetime.now().hour+random.randint(-6, 6))/6*math.pi) + 0.5*random.randint(-1, 1))) - stock_price//1000
+                    cursor.execute("UPDATE stocks SET price=price+? WHERE brand=?", (stock_price, brand))
+                if cursor.execute("SELECT price FROM stocks WHERE brand=?", (brand,)).fetchone()[0] < 100:
+                    cursor.execute("UPDATE stocks SET price=100 WHERE brand=?", (brand,))
+                cursor.execute("INSERT INTO history VALUES (?, ?, ?, ?)", (None, brand, increase, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
             self.database.commit()
                 
             if (9 <= datetime.datetime.now().hour <= 21):
@@ -76,13 +95,13 @@ class investio(commands.Bot):
                 
                 cursor.execute("SELECT * FROM stocks")
                 for row in cursor.fetchall():
-                    stock_info += f"{row[1]}: {row[2]:,}\n"
+                    stock_info += f"{row[0]}: {row[1]:,}\n"
                 
                 user_info = ""
                 cursor.execute("SELECT * FROM user_coins")
                 for row in cursor.fetchall():
                     print(row[1])
-                    user_info += f"{self.guild.get_member(row[1])}: {row[2]:,}\n"
+                    user_info += f"{self.guild.get_member(row[0])}: {row[1]:,}\n"
                 
                 cursor.execute("SELECT * FROM user_coins")
                 
@@ -96,7 +115,7 @@ class investio(commands.Bot):
                 embed.add_field(name="プレイヤー",
                                 value=user_info,
                                 inline=True)
-                await self.guild.get_channel(update_channel_id).send(embed=embed)        
+                await self.guild.get_channel(update_channel_id).send(embed=embed)
         return
 
 # 環境変数の取得

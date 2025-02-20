@@ -57,11 +57,11 @@ class Set(commands.Cog):
                 await ctx.response.send_message(f"brandとvalueを指定してください。\n```brand: 銘柄名\nvalue: 株価```", 
                                                 ephemeral=True)
                 return
-            cursor.execute("SELECT * FROM stocks WHERE name=?", (brand,))
+            cursor.execute("SELECT * FROM stocks WHERE brand=?", (brand,))
             if cursor.fetchone() is None:
                 await ctx.response.send_message(f"{brand}は存在しません。", ephemeral=True)
                 return
-            cursor.execute("UPDATE stocks SET price=? WHERE name=?", (value, brand))
+            cursor.execute("UPDATE stocks SET price=? WHERE brand=?", (value, brand))
             self.database.commit()
             await ctx.response.send_message(f"{brand}の株価を{value}に設定しました。", ephemeral=True)
         return
