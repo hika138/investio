@@ -1,3 +1,7 @@
+"""
+sqlite3のラッパークラスを定義するモジュール
+"""
+
 import sqlite3
 
 class sqlite_wrapper:
