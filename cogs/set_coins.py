@@ -15,7 +15,7 @@ class SetCoins(commands.Cog):
         self.bot = bot
         self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
 
-    @app_commands.command(name="setCoins", description="ユーザーの所持コインを設定します")
+    @app_commands.command(name="setcoins", description="ユーザーの所持コインを設定します")
     async def setcoins(
         self, ctx: discord.Interaction, user: discord.User, amount: int
     ):
@@ -40,3 +40,9 @@ class SetCoins(commands.Cog):
         await ctx.response.send_message(
             f"{user.mention}の所持コインを{amount}に設定しました。", ephemeral=True
         )
+
+async def setup(bot: commands.Bot) -> None:
+    """ 
+    Cogをセットアップする関数
+    """
+    await bot.add_cog(SetCoins(bot))

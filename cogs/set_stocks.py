@@ -16,7 +16,7 @@ class SetStocks(commands.Cog):
         self.bot = bot
         self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
 
-    @app_commands.command(name="setStocks", description="ユーザーの株数を設定します")
+    @app_commands.command(name="setstocks", description="ユーザーの株数を設定します")
     async def setstocks(
         self, ctx: discord.Interaction, user: discord.User, brand: Literal["Rise"], amount: int
     ):
@@ -47,3 +47,9 @@ class SetStocks(commands.Cog):
         await ctx.response.send_message(
             f"{user.mention}の{brand}の株数を{amount}に設定しました。", ephemeral=True
         )
+
+async def setup(bot: commands.Bot) -> None:
+    """ 
+    Cogをセットアップする関数
+    """
+    await bot.add_cog(SetStocks(bot))
