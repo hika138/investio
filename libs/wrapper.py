@@ -171,14 +171,15 @@ class sqlite_wrapper:
         ユーザーの全ての所持株数を取得する関数
         
         :param self: sqlite_wrapperクラスのインスタンス
-        :param user_id: 取得したいユーザーのID
-        :type user_id: int
         :return: ユーザーの全ての所持株数の辞書（銘柄名をキー、株数を値とする）
         :rtype: dict
         """
         self.cursor.execute("SELECT brand, amount FROM user_stocks WHERE user_id = ?", (user_id,))
-        result = self.cursor.fetchall()
-        return {row[0]: row[1] for row in result}
+        dictionary = {}
+        for row in self.cursor.fetchall():
+            brand, amount = row
+            dictionary[brand] = amount
+        return dictionary
 
     def get_stock_price(self, brand:str) -> int:
         """
