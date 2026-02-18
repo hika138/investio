@@ -247,7 +247,7 @@ class sqlite_wrapper:
         self.cursor.execute("SELECT price, time FROM history WHERE brand = ? ORDER BY id DESC", (brand,))
         return self.cursor.fetchall()
 
-    def get_users(self) -> list[int]:
+    def get_users(self) -> list:
         """
         ユーザーのIDを全て取得する関数
         
@@ -258,7 +258,7 @@ class sqlite_wrapper:
         self.cursor.execute("SELECT user_id FROM user_coins")
         return [row[0] for row in self.cursor.fetchall()]
 
-    def get_brands(self) -> list[str]:
+    def get_brands(self) -> list:
         """
         銘柄の名前を全て取得する関数
         
