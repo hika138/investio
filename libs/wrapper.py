@@ -5,16 +5,28 @@ sqlite3のラッパークラスを定義するモジュール
 import sqlite3
 
 class sqlite_wrapper:
-    def __init__(self, database:sqlite3.Connection):
+    def __init__(self, database:str):
         """
         sqlite3のラッパークラスの初期化
         
         :param self: sqlite_wrapperクラスのインスタンス
-        :param database: 指定されたsqlite3のデータベース接続
-        :type database: sqlite3.Connection
+        :param database: 指定されたsqlite3のデータベースファイルパス
+        :type database: str
         """
-        self.database = database
+        self.database = self.connect(database)
         self.cursor = self.database.cursor()
+
+    def connect(self, database:str) -> sqlite3.Connection:
+        """
+        sqlite3のデータベースに接続する関数
+        
+        :param self: sqlite_wrapperクラスのインスタンス
+        :param database: 接続したいsqlite3のデータベースファイルパス
+        :type database: str
+        :return: データベースへの接続オブジェクト
+        :rtype: sqlite3.Connection
+        """
+        return sqlite3.connect(database)
 
     def create_tables(self):
         """

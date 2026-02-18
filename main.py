@@ -12,7 +12,6 @@
 
 from os.path import join, dirname
 import datetime
-import sqlite3
 import os
 import random
 from dotenv import load_dotenv
@@ -51,7 +50,7 @@ class Investio(commands.Bot):
             "Rise": 0, 
         }
         self.stock_brands:list = ["Rise"]
-        self.database:sqlite3.Connection = sqlite3.connect("./save/save.db")
+        self.database:str = "./save/save.db"
         self.sqlite_wrapper = wrapper.sqlite_wrapper(self.database)
         self.guild:discord.Guild = None
         # 株価の変動のパターン
@@ -74,7 +73,6 @@ class Investio(commands.Bot):
 
     async def setup_hook(self):
         """Botのセットアップ処理"""
-        self.database = sqlite3.connect("./save/save.db")
         for extension in self.initial_extensions:
             await self.load_extension(extension)
 
