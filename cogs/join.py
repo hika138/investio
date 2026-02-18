@@ -1,7 +1,6 @@
 """joinコマンドを提供するCog"""
 
 import os
-import sqlite3
 from os.path import dirname, join
 from typing import Any
 
@@ -22,7 +21,6 @@ class Join(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.database: sqlite3.Connection = bot.database
         self.sqlite_wrapper: Any = bot.sqlite_wrapper
 
         self._user_init_coins: int = bot._user_init_coins

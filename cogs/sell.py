@@ -1,6 +1,5 @@
 """ユーザーが株を売却するコマンドを提供するCog"""
 import os
-import sqlite3
 import importlib
 from typing import Literal
 from os.path import join, dirname
@@ -24,13 +23,12 @@ class Sell(commands.Cog):
     """ユーザーが株を売却するコマンドを提供するCog"""
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.database: sqlite3.Connection = bot.database
         self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
 
     @app_commands.command(name="sell", description="株を売却します")
     @app_commands.guilds(guild_id)
     async def sell(
-        self, ctx: discord.Interaction, brand: Literal["Rise", "Swing"], amount: int
+        self, ctx: discord.Interaction, brand: Literal["Rise"], amount: int
     ) -> None:
         """株を売却するコマンド"""
 

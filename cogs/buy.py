@@ -1,6 +1,5 @@
 """buyコマンドを提供するCog"""
 import os
-import sqlite3
 from typing import Literal
 from os.path import join, dirname
 
@@ -23,13 +22,12 @@ class Buy(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.database: sqlite3.Connection = bot.database
         self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
 
     @app_commands.command(name="buy", description="株を購入します")
     @app_commands.guilds(guild_id)
     async def buy(
-        self, ctx: discord.Interaction, brand: Literal["Rise", "Swing"], amount: int
+        self, ctx: discord.Interaction, brand: Literal["Rise"], amount: int
     ):
         """株を購入するコマンド"""
         # ユーザーがゲームに参加していない場合はエラーメッセージを送信

@@ -1,6 +1,5 @@
 """ユーザーの資産状況を表示するコマンドを提供するCog"""
 import os
-import sqlite3
 from os.path import join, dirname
 
 import discord
@@ -19,7 +18,6 @@ class Show(commands.Cog):
     """ユーザーの資産状況を表示するコマンドを提供するCog"""
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.database: sqlite3.Connection = bot.database
         self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
 
     @app_commands.command(
