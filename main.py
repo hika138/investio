@@ -25,7 +25,7 @@ INIT_PRICE_MIN:int = 90
 INIT_PRICE_MAX:int = 110
 MAX_PRICE:int = 660
 MIN_PRICE:int = 6
-patterns:list[list[int]] = [
+patterns:list = [
     [0, -1, 2, -2, 2, -3, 3], # ジグザグ型
     [0, -4, 8, -8, 16, -16, 32], # ジグザグ型（大きな変動）
     [0, 1, 4, 9, 16, 25, 110], # 急上昇型
