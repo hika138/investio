@@ -208,7 +208,7 @@ class sqlite_wrapper:
         self.cursor.execute("UPDATE stocks SET price = ? WHERE brand = ?", (price, brand))
         self.database.commit()
 
-    def get_all_stocks(self) -> list[tuple[str, int]]:
+    def get_all_stocks(self) -> list:
         """
         全ての銘柄の株価を取得する関数
         
@@ -234,7 +234,7 @@ class sqlite_wrapper:
         self.cursor.execute("INSERT INTO history (brand, price, time) VALUES (?, ?, ?)", (brand, price, time))
         self.database.commit()
 
-    def get_history(self, brand:str) -> list[tuple[int, str]]:
+    def get_history(self, brand:str) -> list:
         """
         銘柄の株価変動の履歴を取得する関数
         
