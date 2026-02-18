@@ -10,6 +10,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from libs import wrapper
+from libs import weekday
 
 # 環境変数の取得
 dotenv_path = join(dirname(__file__), "../.env")
@@ -37,6 +38,10 @@ class Buy(commands.Cog):
             await ctx.response.send_message(
                 "まずはjoinコマンドで参加してください。", ephemeral=True
             )
+            return
+
+        if weekday.get_current_weekday() != 0:
+            await ctx.response.send_message("株の購入は日曜日に限られます。", ephemeral=True)
             return
 
         # 購入数が1以上でない場合はエラーメッセージを送信
