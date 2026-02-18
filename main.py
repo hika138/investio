@@ -55,7 +55,6 @@ class Investio(commands.Bot):
         self.guild:discord.Guild = None
         # 株価の変動のパターン
 
-        
         self.pattern = random.choice(patterns) # 初期の変動パターンをランダムに選択
 
         # cogs
@@ -67,7 +66,8 @@ class Investio(commands.Bot):
             "cogs.show",
 
             # 管理者用
-            #"cogs.set",
+            "cogs.setCoins",
+            "cogs.setStocks",
         ]
 
 
