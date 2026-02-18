@@ -66,8 +66,8 @@ class Investio(commands.Bot):
             "cogs.show",
 
             # 管理者用
-            "cogs.setCoins",
-            "cogs.setStocks",
+            "cogs.set_coins",
+            "cogs.set_stocks",
         ]
 
 
