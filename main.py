@@ -11,7 +11,6 @@
 """
 
 from os.path import join, dirname
-import math
 import datetime
 import sqlite3
 import os
@@ -21,6 +20,20 @@ import discord
 from discord.ext import commands, tasks
 
 from libs import wrapper
+from libs import weekday
+
+INIT_PRICE_MIN:int = 90
+INIT_PRICE_MAX:int = 110
+MAX_PRICE:int = 660
+MIN_PRICE:int = 6
+patterns:list[list[int]] = [
+    [0, -1, 2, -2, 2, -3, 3], # ジグザグ型
+    [0, -4, 8, -8, 16, -16, 32], # ジグザグ型（大きな変動）
+    [0, 1, 4, 9, 16, 25, 110], # 急上昇型
+    [0, 1, 2, 4, 8, 16, 32], # 上昇型
+    [0, -1, -2, -3, -4, -5, -6], # 下降型
+    [0, -1, -2, -4, -8, -8, -16] # 急下降型
+]
 
 class Investio(commands.Bot):
     """
@@ -36,12 +49,15 @@ class Investio(commands.Bot):
         self._user_init_coins:int = 10000
         self._user_init_stocks:dict = {
             "Rise": 0, 
-            "Swing": 0,
         }
-        self.stock_brands:list = ["Rise", "Swing"]
-        self.database:sqlite3.Connection = None
+        self.stock_brands:list = ["Rise"]
+        self.database:sqlite3.Connection = sqlite3.connect("./save/save.db")
         self.sqlite_wrapper = wrapper.sqlite_wrapper(self.database)
         self.guild:discord.Guild = None
+        # 株価の変動のパターン
+
+        
+        self.pattern = random.choice(patterns) # 初期の変動パターンをランダムに選択
 
         # cogs
         self.initial_extensions = [
@@ -55,11 +71,13 @@ class Investio(commands.Bot):
             #"cogs.set",
         ]
 
+
     async def setup_hook(self):
         """Botのセットアップ処理"""
         self.database = sqlite3.connect("./save/save.db")
         for extension in self.initial_extensions:
             await self.load_extension(extension)
+
 
     async def on_ready(self):
         """Botが起動したときの処理"""
@@ -82,8 +100,52 @@ class Investio(commands.Bot):
         self.fluctuation.start()
         return
 
+
+    def change_stock_price(self, day:int, stock_price:int) -> int:
+        """
+        株価の変動を行う関数
+        
+        :param self: Investioクラスのインスタンス
+        :param day: 現在の曜日(0:日曜日, 1:月曜日, ..., 6:土曜日)
+        :type day: int
+        :param stock_price: 現在の株価
+        :type stock_price: int
+        :return: 変動後の株価
+        :rtype: int
+        """
+        # 7日ごとに新しいパターンを選択し、株価をリセットする
+        if day % 7 == 0:
+            stock_price = random.randint(INIT_PRICE_MIN, INIT_PRICE_MAX)
+            # 先週が上昇系だった場合、次は下降系を選ぶ確率を高くする
+            if patterns.index(self.pattern) in [2, 3]: # 上昇系
+                self.pattern = random.choices(patterns, weights=
+                                         [1, 1, 0.1, 0.1, 10, 10]
+                                        )[0]
+
+            # 先週が下降系だった場合、次はジグザグ系を選ぶ確率を高くする
+            if patterns.index(self.pattern) in [4, 5]: # 下降系
+                self.pattern = random.choices(patterns, weights=
+                                         [10, 10, 1, 1, 0.1, 0.1]
+                                        )[0]
+
+            # 先週がジグザグ型だった場合、次は上昇系を選ぶ確率を高くする
+            if patterns.index(self.pattern) in [0, 1]: # ジグザグ型
+                self.pattern = random.choices(patterns, weights=
+                                         [0.1, 0.1, 1, 1, 10, 10]
+                                        )[0]
+            self.pattern = random.choice(patterns)
+        # 1日ごとにランダムな変動を加える
+        else:
+            stock_price += self.pattern[day % len(self.pattern)]*random.randint(1, 4)-int(self.pattern[day % len(self.pattern)]*random.random())
+            if day % 7 > 3: # 週の後半
+                if random.random() < 0.05: # 5%の確率で急下降
+                    stock_price -= stock_price * int(random.uniform(0.5, 0.75)) # 50%から75%の範囲で急下降
+            stock_price = min(stock_price, MAX_PRICE) # 株価の上限
+            stock_price = max(stock_price, MIN_PRICE)  # 株価の下限
+        return stock_price
+
+
     @tasks.loop(time=datetime.time(hour=6, minute=0, second=0, tzinfo=datetime.timezone(datetime.timedelta(hours=9))))
-    @tasks.loop(time=datetime.time(hour=18, minute=0, second=0, tzinfo=datetime.timezone(datetime.timedelta(hours=9))))
     async def fluctuation(self):
         """
         株価の変動を定期的に行うタスク
@@ -93,9 +155,8 @@ class Investio(commands.Bot):
         # 株価の変動
         for brand in self.stock_brands:
             if brand == "Rise":
-                pass
-            elif brand == "Swing":
-                pass
+                new_price = self.change_stock_price(weekday.get_current_weekday(), self.sqlite_wrapper.get_stock_price(brand))
+                self.sqlite_wrapper.set_stock_price(brand, new_price)
 
             # 通知
             await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
@@ -129,6 +190,7 @@ class Investio(commands.Bot):
                             inline=True)
             await self.guild.get_channel(update_channel_id).send(embed=embed)
         return
+
 
 # 環境変数の取得
 dotenv_path = join(dirname(__file__), '.env')
