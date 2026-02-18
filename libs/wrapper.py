@@ -166,7 +166,7 @@ class sqlite_wrapper:
             self.cursor.execute("UPDATE user_stocks SET amount = ? WHERE user_id = ? AND brand = ?", (amount, user_id, brand))
         self.database.commit()
 
-    def get_all_user_stocks(self, user_id:int) -> dict[str, int]:
+    def get_all_user_stocks(self, user_id:int) -> dict:
         """
         ユーザーの全ての所持株数を取得する関数
         
