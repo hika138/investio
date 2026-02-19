@@ -1,13 +1,22 @@
 """
 管理者が株数を操作するためのコグ
 """
-
+import os
+from os.path import join, dirname
 from typing import Literal
+from dotenv import load_dotenv
+
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from libs import wrapper
+
+
+env_path = join(dirname(__file__), "../.env")
+load_dotenv(env_path)
+guild_id = int(os.environ.get("GUILD_ID", "0"))
 
 class SetStocks(commands.Cog):
     """管理者が株数を操作するためのコグ"""
@@ -17,6 +26,7 @@ class SetStocks(commands.Cog):
         self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
 
     @app_commands.command(name="setstocks", description="ユーザーの株数を設定します")
+    @app_commands.guilds(guild_id)
     async def setstocks(
         self, ctx: discord.Interaction, user: discord.User, brand: Literal["Rise"], amount: int
     ):

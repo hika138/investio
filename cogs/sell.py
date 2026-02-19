@@ -1,28 +1,26 @@
 """ユーザーが株を売却するコマンドを提供するCog"""
+
 import os
-import importlib
-from typing import Literal
 from os.path import join, dirname
+from typing import Literal
+from dotenv import load_dotenv
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
+
 from libs import wrapper
 
-# Load .env if available (use importlib to avoid identifier named "dotenv")
-_dotenv_mod = importlib.import_module("dotenv")
-_load_dotenv = getattr(_dotenv_mod, "load_dotenv")
-
-env_path = join(dirname(__file__), "../.env")
-_load_dotenv(env_path)
-guild_id = int(os.environ.get("GUILD_ID", "0"))
-
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+guild_id = int(os.environ.get("GUILD_ID"))
 
 class Sell(commands.Cog):
     """ユーザーが株を売却するコマンドを提供するCog"""
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.guild = bot.guild
         self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
 
     @app_commands.command(name="sell", description="株を売却します")

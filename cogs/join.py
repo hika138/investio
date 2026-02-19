@@ -2,12 +2,12 @@
 
 import os
 from os.path import dirname, join
-from typing import Any
+from dotenv import load_dotenv
 
 import discord
 from discord import app_commands
 from discord.ext import commands
-from dotenv import load_dotenv
+from libs import wrapper
 
 # 環境変数の取得
 dotenv_path = join(dirname(__file__), "../.env")
@@ -21,7 +21,7 @@ class Join(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.sqlite_wrapper: Any = bot.sqlite_wrapper
+        self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
 
         self._user_init_coins: int = bot._user_init_coins
         self._user_init_stocks: dict = bot._user_init_stocks

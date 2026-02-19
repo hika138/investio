@@ -2,11 +2,19 @@
 管理者がユーザーの所持コインを操作するためのコグ
 """
 
+import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from libs import wrapper
+
+env_path = join(dirname(__file__), "../.env")
+load_dotenv(env_path)
+guild_id = int(os.environ.get("GUILD_ID", "0"))
 
 class SetCoins(commands.Cog):
     """管理者がユーザーの所持コインを操作するためのコグ"""
@@ -16,6 +24,7 @@ class SetCoins(commands.Cog):
         self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
 
     @app_commands.command(name="setcoins", description="ユーザーの所持コインを設定します")
+    @app_commands.guilds(guild_id)
     async def setcoins(
         self, ctx: discord.Interaction, user: discord.User, amount: int
     ):
