@@ -10,10 +10,12 @@
 - `/set <銘柄> <価格>`: 指定した銘柄の株価を手動で設定します。
 """
 
+import os
 from os.path import join, dirname
 import datetime
-import os
 import random
+from typing import List, Dict
+
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands, tasks
@@ -46,12 +48,12 @@ class Investio(commands.Bot):
         )
         # 初期値
         self._user_init_coins:int = 10000
-        self._user_init_stocks:dict = {
+        self._user_init_stocks:Dict[str, int] = {
             "Rise": 0, 
         }
-        self.stock_brands:list = ["Rise"]
+        self.stock_brands:List[str] = ["Rise"]
         self.database:str = "./save/save.db"
-        self.sqlite_wrapper = wrapper.sqlite_wrapper(self.database)
+        self.sqlite_wrapper = wrapper.SqliteWrapper(self.database)
         self.guild:discord.Guild = None
         # 株価の変動のパターン
 
@@ -68,6 +70,7 @@ class Investio(commands.Bot):
             # 管理者用
             "cogs.set_coins",
             "cogs.set_stocks",
+            "cogs.init",
         ]
 
 

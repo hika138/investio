@@ -3,8 +3,12 @@ sqlite3のラッパークラスを定義するモジュール
 """
 
 import sqlite3
+from typing import List, Dict
 
-class sqlite_wrapper:
+class SqliteWrapper:
+    """
+    sqlite3のラッパークラス
+    """
     def __init__(self, database:str):
         """
         sqlite3のラッパークラスの初期化
@@ -42,15 +46,14 @@ class sqlite_wrapper:
         """)
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS user_stocks (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER,
                 brand TEXT,
-                amount INTEGER NOT NULL
+                amount INTEGER NOT NULL,
+                PRIMARY KEY (user_id, brand)
             )
         """)
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS stocks (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 brand TEXT PRIMARY KEY,
                 price INTEGER NOT NULL
             )
@@ -65,7 +68,7 @@ class sqlite_wrapper:
         """)
         self.database.commit()
 
-    def initialize_brands(self, brands:list):
+    def initialize_brands(self, brands:List[str]):
         """
         銘柄を初期化する関数
         
@@ -87,7 +90,7 @@ class sqlite_wrapper:
         self.cursor.execute("DELETE FROM history")
         self.database.commit()
 
-    def initialize_user(self, user_id:int, initial_coins:int, initial_stocks:dict):
+    def initialize_user(self, user_id:int, initial_coins:int, initial_stocks:Dict[str, int]):
         """
         ユーザーの所持金と所持株数を初期化する関数
         
@@ -167,7 +170,7 @@ class sqlite_wrapper:
             self.cursor.execute("UPDATE user_stocks SET amount = ? WHERE user_id = ? AND brand = ?", (amount, user_id, brand))
         self.database.commit()
 
-    def get_all_user_stocks(self, user_id:int) -> dict:
+    def get_all_user_stocks(self, user_id:int) -> Dict[str, int]:
         """
         ユーザーの全ての所持株数を取得する関数
         
@@ -176,7 +179,7 @@ class sqlite_wrapper:
         :rtype: dict
         """
         self.cursor.execute("SELECT brand, amount FROM user_stocks WHERE user_id = ?", (user_id,))
-        dictionary = {}
+        dictionary: Dict[str, int] = {}
         for row in self.cursor.fetchall():
             brand, amount = row
             dictionary[brand] = amount
@@ -209,7 +212,7 @@ class sqlite_wrapper:
         self.cursor.execute("UPDATE stocks SET price = ? WHERE brand = ?", (price, brand))
         self.database.commit()
 
-    def get_all_stocks(self) -> list:
+    def get_all_stocks(self) -> List[tuple]:
         """
         全ての銘柄の株価を取得する関数
         
@@ -235,7 +238,7 @@ class sqlite_wrapper:
         self.cursor.execute("INSERT INTO history (brand, price, time) VALUES (?, ?, ?)", (brand, price, time))
         self.database.commit()
 
-    def get_history(self, brand:str) -> list:
+    def get_history(self, brand:str) -> List[tuple]:
         """
         銘柄の株価変動の履歴を取得する関数
         
@@ -248,7 +251,7 @@ class sqlite_wrapper:
         self.cursor.execute("SELECT price, time FROM history WHERE brand = ? ORDER BY id DESC", (brand,))
         return self.cursor.fetchall()
 
-    def get_users(self) -> list:
+    def get_users(self) -> List[int]:
         """
         ユーザーのIDを全て取得する関数
         
@@ -259,7 +262,7 @@ class sqlite_wrapper:
         self.cursor.execute("SELECT user_id FROM user_coins")
         return [row[0] for row in self.cursor.fetchall()]
 
-    def get_brands(self) -> list:
+    def get_brands(self) -> List[str]:
         """
         銘柄の名前を全て取得する関数
         
