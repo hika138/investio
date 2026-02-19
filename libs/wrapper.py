@@ -42,14 +42,15 @@ class sqlite_wrapper:
         """)
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS user_stocks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER,
                 brand TEXT,
-                amount INTEGER NOT NULL,
-                PRIMARY KEY (user_id, brand)
+                amount INTEGER NOT NULL
             )
         """)
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS stocks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 brand TEXT PRIMARY KEY,
                 price INTEGER NOT NULL
             )
