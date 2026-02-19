@@ -114,8 +114,8 @@ class Investio(commands.Bot):
         :return: 変動後の株価
         :rtype: int
         """
-        # 7日ごとに新しいパターンを選択し、株価をリセットする
-        if day % 7 == 0:
+        # 日曜日の場合、変動パターンを選択して初期株価を設定
+        if day == 0:
             stock_price = random.randint(INIT_PRICE_MIN, INIT_PRICE_MAX)
             # 先週が上昇系だった場合、次は下降系を選ぶ確率を高くする
             if patterns.index(self.pattern) in [2, 3]: # 上昇系
@@ -156,8 +156,12 @@ class Investio(commands.Bot):
         # 株価の変動
         for brand in self.stock_brands:
             if brand == "Rise":
-                new_price = self.change_stock_price(weekday.get_current_weekday(), self.sqlite_wrapper.get_stock_price(brand))
+                today_weekday = weekday.get_current_weekday()
+                new_price = self.change_stock_price(today_weekday, self.sqlite_wrapper.get_stock_price(brand))
                 self.sqlite_wrapper.set_stock_price(brand, new_price)
+                if today_weekday == 0: # 日曜日ならユーザーの持ち株をリセット
+                    for user in self.sqlite_wrapper.get_users():
+                        self.sqlite_wrapper.set_user_stocks(user, brand, self._user_init_stocks[brand])
 
             # 通知
             await self.guild.get_channel(update_channel_id).send("株価が更新されました！")
