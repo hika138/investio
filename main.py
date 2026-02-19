@@ -47,7 +47,7 @@ class Investio(commands.Bot):
             command_prefix='h!'
         )
         # 初期値
-        self._user_init_coins:int = 10000
+        self._user_init_coins:int = 1000
         self._user_init_stocks:Dict[str, int] = {
             "Rise": 0, 
         }

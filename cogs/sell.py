@@ -21,7 +21,7 @@ class Sell(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.guild = bot.guild
-        self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
+        self.sqlite_wrapper: wrapper.SqliteWrapper = bot.sqlite_wrapper
 
     @app_commands.command(name="sell", description="株を売却します")
     @app_commands.guilds(guild_id)
@@ -32,13 +32,13 @@ class Sell(commands.Cog):
 
         # ユーザーの所持金と株数を取得
         # ユーザーがゲームに参加していない場合はエラーメッセージを送信
-        user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)
-        if user_coins is None:
+        if not self.sqlite_wrapper.is_exist_user(ctx.user.id):
             await ctx.response.send_message(
                 "まずはjoinコマンドで参加してください。", ephemeral=True
             )
             return
 
+        user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)        
         # 売却数が1以上でない場合はエラーメッセージを送信
         if amount <= 0:
             await ctx.response.send_message(

@@ -78,9 +78,9 @@ class SqliteWrapper:
         """
         self.cursor.execute("DELETE FROM stocks")
         for brand in brands:
-            self.cursor.execute("INSERT INTO stocks VALUES (?, ?)", (brand, 1000))
+            self.cursor.execute("INSERT INTO stocks VALUES (?, ?)", (brand, 100))
         self.database.commit()
-  
+
     def initialize_history(self):
         """
         株価変動の履歴を初期化する関数
@@ -272,3 +272,16 @@ class SqliteWrapper:
         """
         self.cursor.execute("SELECT brand FROM stocks")
         return [row[0] for row in self.cursor.fetchall()]
+
+    def is_exist_user(self, user_id:int) -> bool:
+        """
+        ユーザーが存在するかどうかを判定する関数
+        
+        :param self: sqlite_wrapperクラスのインスタンス
+        :param user_id: 判定したいユーザーのID
+        :type user_id: int
+        :return: ユーザーが存在する場合はTrue、存在しない場合はFalse
+        :rtype: bool
+        """
+        self.cursor.execute("SELECT 1 FROM user_coins WHERE user_id = ?", (user_id,))
+        return self.cursor.fetchone() is not None

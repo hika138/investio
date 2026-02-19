@@ -17,7 +17,7 @@ class Init(commands.Cog):
     """データベースを初期化するためのCog"""
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
+        self.sqlite_wrapper: wrapper.SqliteWrapper = bot.sqlite_wrapper
 
     @app_commands.command(name="init", description="データベースを初期化します")
     @app_commands.guilds(guild_id)

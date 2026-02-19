@@ -22,7 +22,7 @@ class Buy(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
+        self.sqlite_wrapper: wrapper.SqliteWrapper = bot.sqlite_wrapper
 
     @app_commands.command(name="buy", description="株を購入します")
     @app_commands.guilds(guild_id)
@@ -32,7 +32,7 @@ class Buy(commands.Cog):
         """株を購入するコマンド"""
         # ユーザーがゲームに参加していない場合はエラーメッセージを送信
         user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)
-        if user_coins is None:
+        if not self.sqlite_wrapper.is_exist_user(ctx.user.id):
             await ctx.response.send_message(
                 "まずはjoinコマンドで参加してください。", ephemeral=True
             )

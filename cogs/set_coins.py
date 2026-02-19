@@ -21,7 +21,7 @@ class SetCoins(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
+        self.sqlite_wrapper: wrapper.SqliteWrapper = bot.sqlite_wrapper
 
     @app_commands.command(name="setcoins", description="ユーザーの所持コインを設定します")
     @app_commands.guilds(guild_id)
@@ -30,8 +30,7 @@ class SetCoins(commands.Cog):
     ):
         """ユーザーの所持コインを設定するコマンド"""
         # ユーザーがゲームに参加していない場合はエラーメッセージを送信
-        user_coins = self.sqlite_wrapper.get_user_coins(user.id)
-        if user_coins is None:
+        if not self.sqlite_wrapper.is_exist_user(user.id):
             await ctx.response.send_message(
                 "そのユーザーはゲームに参加していません。", ephemeral=True
             )

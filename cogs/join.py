@@ -21,7 +21,7 @@ class Join(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.sqlite_wrapper: wrapper.sqlite_wrapper = bot.sqlite_wrapper
+        self.sqlite_wrapper: wrapper.SqliteWrapper = bot.sqlite_wrapper
 
         self._user_init_coins: int = bot._user_init_coins
         self._user_init_stocks: dict = bot._user_init_stocks
@@ -32,7 +32,7 @@ class Join(commands.Cog):
         """ゲームに参加するコマンド"""
         # ユーザーがすでにゲームに参加しているか確認
         user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)
-        if user_coins is None:
+        if not self.sqlite_wrapper.is_exist_user(ctx.user.id):
             # ユーザーの所持金と株数を初期化
             self.sqlite_wrapper.set_user_coins(ctx.user.id, self._user_init_coins)
             for brand, amount in self._user_init_stocks.items():
