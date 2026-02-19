@@ -23,6 +23,11 @@ class Init(commands.Cog):
     @app_commands.guilds(guild_id)
     async def init(self, ctx: discord.Interaction) -> None:
         """データベースを初期化するコマンド"""
+        if not ctx.user.guild_permissions.administrator:
+            await ctx.response.send_message(
+                "このコマンドを使用するには管理者権限が必要です。", ephemeral=True
+            )
+            return
         self.sqlite_wrapper.create_tables()
         await ctx.response.send_message("データベースを初期化しました。", ephemeral=True)
 

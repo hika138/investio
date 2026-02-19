@@ -31,6 +31,11 @@ class SetStocks(commands.Cog):
         self, ctx: discord.Interaction, user: discord.User, brand: Literal["Rise"], amount: int
     ):
         """ユーザーの株数を設定するコマンド"""
+        if not ctx.user.guild_permissions.administrator:
+            await ctx.response.send_message(
+                "このコマンドを使用するには管理者権限が必要です。", ephemeral=True
+            )
+            return
         # ユーザーがゲームに参加していない場合はエラーメッセージを送信
         if not self.sqlite_wrapper.is_exist_user(user.id):
             await ctx.response.send_message(
