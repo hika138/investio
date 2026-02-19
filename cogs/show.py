@@ -56,16 +56,18 @@ class Show(commands.Cog):
             return
         user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)
         user_stocks = self.sqlite_wrapper.get_all_user_stocks(ctx.user.id)
+        print(user_coins)
+        print(user_stocks)
         stocks = self.sqlite_wrapper.get_all_stocks()
         msg = ""
         msg += "あなたの情報\n"
         msg += f"コイン: {user_coins:,}枚\n"
         msg += "\n持ち株\n"
-        for stock in user_stocks:
-            msg += f"{stock[0]}: {stock[1]:,}株\n"
+        for brand, amount in user_stocks.items():
+            msg += f"{brand}: {amount:,}株\n"
         msg += "\n株価\n"
-        for stock in stocks:
-            msg += f"{stock[0]}: {stock[1]:,}コイン\n"
+        for brand, price in stocks:
+            msg += f"{brand}: {price:,}コイン\n"
         await ctx.response.send_message(msg, ephemeral=True)
         return
 
