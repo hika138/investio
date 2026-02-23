@@ -3,7 +3,7 @@ sqlite3のラッパークラスを定義するモジュール
 """
 
 import sqlite3
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 class SqliteWrapper:
     """
@@ -228,7 +228,7 @@ class SqliteWrapper:
         self.cursor.execute("SELECT brand FROM stocks")
         return [row[0] for row in self.cursor.fetchall()]
     
-    def get_all_stock_prices(self) -> List[tuple[str, int]]:
+    def get_all_stock_prices(self) -> List[Tuple[str, int]]:
         """
         全ての銘柄の株価を取得する関数
         
