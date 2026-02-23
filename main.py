@@ -71,6 +71,7 @@ class Investio(commands.Bot):
             "cogs.set_coins",
             "cogs.set_stocks",
             "cogs.init",
+            "cogs.reload"
         ]
 
 
