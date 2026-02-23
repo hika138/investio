@@ -27,7 +27,7 @@ class Buy(commands.Cog):
     @app_commands.command(name="buy", description="株を購入します")
     @app_commands.guilds(guild_id)
     async def buy(
-        self, ctx: discord.Interaction, brand: Literal["Rise"], amount: int
+        self, ctx: discord.Interaction, brand: Literal["Rise"], amount: int, force:bool = False
     ):
         """株を購入するコマンド"""
         # ユーザーがゲームに参加していない場合はエラーメッセージを送信
@@ -38,7 +38,7 @@ class Buy(commands.Cog):
             )
             return
 
-        if weekday.get_current_weekday() != 0:
+        if weekday.get_current_weekday() != 0 and not force:
             await ctx.response.send_message("株の購入は日曜日に限られます。", ephemeral=True)
             return
 
