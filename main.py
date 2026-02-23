@@ -87,11 +87,6 @@ class Investio(commands.Bot):
 
         # テーブルの作成
         self.sqlite_wrapper.create_tables()
-        # 銘柄の初期化
-        self.sqlite_wrapper.initialize_brands(self.stock_brands)
-
-        # 履歴の初期化
-        self.sqlite_wrapper.initialize_history()
 
         # 株価の変動を開始
         self.fluctuation.start()
