@@ -25,7 +25,7 @@ class SetCoins(commands.Cog):
 
     @app_commands.command(name="setcoins", description="ユーザーの所持コインを設定します")
     @app_commands.guilds(guild_id)
-    async def setcoins(
+    async def set_coins(
         self, ctx: discord.Interaction, user: discord.User, amount: int
     ):
         """ユーザーの所持コインを設定するコマンド"""

@@ -66,7 +66,8 @@ class Buy(commands.Cog):
         if self.sqlite_wrapper.get_user_stocks(ctx.user.id, brand) is None:
             self.sqlite_wrapper.set_user_stocks(ctx.user.id, brand, 0)
         self.sqlite_wrapper.set_user_coins(ctx.user.id, user_coins - stock_price * amount)
-        self.sqlite_wrapper.set_user_stocks(ctx.user.id, brand, self.sqlite_wrapper.get_user_stocks(ctx.user.id, brand) + amount)
+        new_stocks = self.sqlite_wrapper.get_user_stocks(ctx.user.id, brand) + amount
+        self.sqlite_wrapper.set_user_stocks(ctx.user.id, brand, new_stocks)
         await ctx.response.send_message(
             f"{brand}を{amount}株購入しました。", ephemeral=True
         )

@@ -27,7 +27,7 @@ class SetStocks(commands.Cog):
 
     @app_commands.command(name="setstocks", description="ユーザーの株数を設定します")
     @app_commands.guilds(guild_id)
-    async def setstocks(
+    async def set_stocks(
         self, ctx: discord.Interaction, user: discord.User, brand: Literal["Rise"], amount: int
     ):
         """ユーザーの株数を設定するコマンド"""

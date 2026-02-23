@@ -31,7 +31,6 @@ class Join(commands.Cog):
     async def join(self, ctx: discord.Interaction):
         """ゲームに参加するコマンド"""
         # ユーザーがすでにゲームに参加しているか確認
-        user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)
         if not self.sqlite_wrapper.is_exist_user(ctx.user.id):
             # ユーザーの所持金と株数を初期化
             self.sqlite_wrapper.set_user_coins(ctx.user.id, self._user_init_coins)

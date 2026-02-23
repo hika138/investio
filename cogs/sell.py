@@ -38,7 +38,7 @@ class Sell(commands.Cog):
             )
             return
 
-        user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)        
+        user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)
         # 売却数が1以上でない場合はエラーメッセージを送信
         if amount <= 0:
             await ctx.response.send_message(
