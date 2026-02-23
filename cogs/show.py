@@ -37,7 +37,7 @@ class Show(commands.Cog):
                 await ctx.response.send_message("そのユーザーはゲームに参加していません。", ephemeral=True)
                 return
             user_stocks = self.sqlite_wrapper.get_all_user_stocks(user.id)
-            stocks = self.sqlite_wrapper.get_all_stocks()
+            stocks = self.sqlite_wrapper.get_all_stock_prices()
             msg = ""
             msg += f"{user.mention}の情報\n"
             msg += f"コイン: {user_coins:,}枚\n"
@@ -56,9 +56,7 @@ class Show(commands.Cog):
             return
         user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)
         user_stocks = self.sqlite_wrapper.get_all_user_stocks(ctx.user.id)
-        print(user_coins)
-        print(user_stocks)
-        stocks = self.sqlite_wrapper.get_all_stocks()
+        stocks = self.sqlite_wrapper.get_all_stock_prices()
         msg = ""
         msg += "あなたの情報\n"
         msg += f"コイン: {user_coins:,}枚\n"

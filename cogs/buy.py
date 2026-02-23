@@ -31,7 +31,6 @@ class Buy(commands.Cog):
     ):
         """株を購入するコマンド"""
         # ユーザーがゲームに参加していない場合はエラーメッセージを送信
-        user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)
         if not self.sqlite_wrapper.is_exist_user(ctx.user.id):
             await ctx.response.send_message(
                 "まずはjoinコマンドで参加してください。", ephemeral=True
@@ -57,6 +56,7 @@ class Buy(commands.Cog):
         stock_price = self.sqlite_wrapper.get_stock_price(brand)
 
         # ユーザーの所持金が足りない場合はエラーメッセージを送信
+        user_coins = self.sqlite_wrapper.get_user_coins(ctx.user.id)
         if user_coins < stock_price * amount:
             await ctx.response.send_message("コインが足りません。", ephemeral=True)
             return

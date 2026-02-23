@@ -41,18 +41,24 @@ class SetCoins(commands.Cog):
             )
             return
 
-        # 所持コインが0以上でない場合はエラーメッセージを送信
+        # コインが0以上でない場合はエラーメッセージを送信
         if amount < 0:
             await ctx.response.send_message(
-                "所持コインは0以上で指定してください。", ephemeral=True
+                "コインは0以上で指定してください。", ephemeral=True
             )
             return
 
         # 所持コインを設定
-        self.sqlite_wrapper.set_user_coins(user.id, amount)
-        await ctx.response.send_message(
-            f"{user.mention}の所持コインを{amount}に設定しました。", ephemeral=True
-        )
+        result = self.sqlite_wrapper.set_user_coins(user.id, amount)
+        if result == 0:
+            await ctx.response.send_message(
+                f"{user.mention}の所持コインを{amount}に設定しました。", ephemeral=True
+            )
+        else:
+            await ctx.response.send_message(
+                "ユーザーが存在しません。", ephemeral=True
+            )
+
 
 async def setup(bot: commands.Bot) -> None:
     """ 

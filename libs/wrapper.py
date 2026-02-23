@@ -29,7 +29,7 @@ class SqliteWrapper:
         :type database: str
         :return: データベースへの接続オブジェクト
         :rtype: sqlite3.Connection
-        """
+        """ 
         return sqlite3.connect(database)
 
     def create_tables(self):
@@ -120,7 +120,7 @@ class SqliteWrapper:
         result = self.cursor.fetchone()
         return result[0] if result else 0
 
-    def set_user_coins(self, user_id:int, amount:int):
+    def set_user_coins(self, user_id:int, amount:int) -> int: # TODO:Errorを実装する
         """
         ユーザーの所持金を設定する関数
         
@@ -129,12 +129,14 @@ class SqliteWrapper:
         :type user_id: int
         :param amount: 設定したい所持金の額
         :type amount: int
+        :return: USER_NOT_FOUND
+        :rtype: int
         """
-        if self.get_user_coins(user_id) == 0:
-            self.cursor.execute("INSERT INTO user_coins VALUES (?, ?)", (user_id, amount))
-        else:
-            self.cursor.execute("UPDATE user_coins SET amount = ? WHERE user_id = ?", (amount, user_id))
+        if not self.is_exist_user(user_id):
+            return -1 
+        self.cursor.execute("UPDATE user_coins SET amount = ? WHERE user_id = ?", (amount, user_id))
         self.database.commit()
+        return 0
 
     def get_user_stocks(self, user_id:int, brand:str) -> int:
         """
@@ -163,12 +165,15 @@ class SqliteWrapper:
         :type brand: str
         :param amount: 設定したい所持株数
         :type amount: int
+        :return: USER_NOT_FOUND
+        :rtype: int
         """
-        if self.get_user_stocks(user_id, brand) == 0:
-            self.cursor.execute("INSERT INTO user_stocks VALUES (?, ?, ?)", (user_id, brand, amount))
-        else:
-            self.cursor.execute("UPDATE user_stocks SET amount = ? WHERE user_id = ? AND brand = ?", (amount, user_id, brand))
+
+        if not self.is_exist_user(user_id):
+            return -1
+        self.cursor.execute("UPDATE user_stocks SET amount = ? WHERE user_id = ? AND brand = ?", (amount, user_id, brand))
         self.database.commit()
+        return 0
 
     def get_all_user_stocks(self, user_id:int) -> Dict[str, int]:
         """
@@ -212,7 +217,18 @@ class SqliteWrapper:
         self.cursor.execute("UPDATE stocks SET price = ? WHERE brand = ?", (price, brand))
         self.database.commit()
 
-    def get_all_stocks(self) -> List[tuple]:
+    def get_all_stocks(self) -> List[str]:
+        """
+        全ての銘柄を取得する関数
+        
+        :param self: sqlite_wrapperクラスのインスタンス
+        :return: 全ての銘柄の株価のリスト（各要素は(銘柄名, 株価)のタプル）
+        :rtype: list[str]
+        """
+        self.cursor.execute("SELECT brand FROM stocks")
+        return [row[0] for row in self.cursor.fetchall()]
+    
+    def get_all_stock_prices(self) -> List[tuple[str, int]]:
         """
         全ての銘柄の株価を取得する関数
         
