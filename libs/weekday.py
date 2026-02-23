@@ -13,5 +13,6 @@ def get_current_weekday() -> int:
     :rtype: int
     """
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))) # 日本時間で現在の日時を取得
-    weekday = (now - datetime.timedelta(days=1)).weekday() # 日曜日を0にするために1日引く
+    # 日曜日を0にする
+    weekday = (now + datetime.timedelta(days=1)).weekday()%7
     return weekday
