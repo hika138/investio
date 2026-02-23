@@ -85,10 +85,6 @@ class Investio(commands.Bot):
         self.guild = self.get_guild(guild_id)
         await self.tree.sync(guild=self.guild)
 
-        # 開始通知
-        print("get on ready!")
-        await self.guild.get_channel(notify_channel_id).send("起動しました！")
-
         # テーブルの作成
         self.sqlite_wrapper.create_tables()
         # 銘柄の初期化
@@ -99,7 +95,10 @@ class Investio(commands.Bot):
 
         # 株価の変動を開始
         self.fluctuation.start()
-        return
+    
+        # 開始通知
+        print("get on ready!")
+        await self.guild.get_channel(notify_channel_id).send("起動しました！")
 
 
     def change_stock_price(self, day:int, stock_price:int) -> int:
