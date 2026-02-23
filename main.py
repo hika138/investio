@@ -95,7 +95,7 @@ class Investio(commands.Bot):
 
         # 株価の変動を開始
         self.fluctuation.start()
-    
+
         # 開始通知
         print("get on ready!")
         await self.guild.get_channel(notify_channel_id).send("起動しました！")
